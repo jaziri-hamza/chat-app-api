@@ -1,0 +1,29 @@
+version: "3"
+services:
+
+  node:
+    container_name: node
+    build: .
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - 3000:3000
+    depends_on: 
+      - mongo
+    tty: true
+
+  mongo:
+    container_name: mongodb
+    image: mongo
+    ports:
+      - 27017:27017
+      
+
+  admin-mongo:
+    container_name: admin-mongodb
+    image: mongo-express
+    ports:
+      - 8080:8080
+    depends_on: 
+      - mongo
