@@ -60,6 +60,9 @@ const user = mongo.Schema({
         trim: true,
         lowercase: true
     },
+    favorite: [
+        mongo.Schema.Types.ObjectId
+    ],
     createdAt: {
         type: Date,
         default: Date.now
