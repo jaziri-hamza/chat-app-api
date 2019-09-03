@@ -7,10 +7,10 @@ const mongo = require('mongoose');
 const message = mongo.Schema({
     users: [{
         type: mongo.Schema.Types.ObjectId,
-        ref: User,
+        ref: 'User',
     }],
     msg: [{
-        sendBy: Number,
+        _id: mongo.Schema.Types.ObjectId,
         body: String,
         createdAt: {
             type: Date,
@@ -18,3 +18,6 @@ const message = mongo.Schema({
         }
     }]
 });
+
+
+module.exports = mongo.model('Message', message);
