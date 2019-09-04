@@ -7,6 +7,23 @@ const guard = require('../guard/guard');
 router.get('/', guard, (req, res)=>{
     // load all messages by pagination
     // just get last msg body 
+
+    const page = parseInt(req.query['pages']) || 1;
+    const currentUserId = req.currentUser.id;
+    console.log(currentUserId);
+    messageModel.find({
+        users: { $in: currentUserId },
+    }).populate('msg._id', 'firstName lastName').populate({
+        path: 'users',
+        match: {  _id:  { $ne : currentUserId} },
+        select: 'firstName lastName'
+    }).select('msg users').slice('msg', -1)
+    .skip(page*10-10).limit(page*10).then( result =>{
+        res.status(200).json(result);
+    }).catch( error => {
+        res.status(500).json(error);
+    });
+
 });
 
 
@@ -16,16 +33,23 @@ router.get('/:userid', guard, (req,res)=>{
 
     const userid = req.params.userid;
     const currentUserId = req.currentUser.id;
-    messageModel.findOne({
+
+    const page = parseInt(req.query['pages']) || 1;
+
+    console.log(currentUserId);
+    messageModel.find({
         users: { $all: [userid, currentUserId] }
-    }).then(result => {
-        if(result == null )
-            res.status(200).json(result);
-        else 
-            res.status(201).json();
-    }).catch( error=> {
+    },{ 
+        select: 'msg'
+    }).populate('msg._id', 'firstName lastName')
+    .slice('msg', page*10-10, page*10).then( result =>{
+        res.status(200).json(result);
+    }).catch( error => {
         res.status(500).json(error);
-    })
+    });
+
+
+    
 
 
 });
@@ -54,26 +78,17 @@ router.post('/:userid', guard, (req,res)=>{
             });
 
         }else{
-            
-            // add item to array
-            // result.update(
+            // add item to array at exist message
             result.update({$push: { msg: { _id: currentUserId, body: req.body.body}  } }).then( resultUpdate =>{
                 res.status(200).json(resultUpdate);
-                
             }).catch( errorUpdate=>{
-                console.log(result);
-                console.log(errorUpdate);
                 res.status(500).json(errorUpdate);
             });
-            // )
         }
 
     }).catch( error => {
         res.status(500).json(error);
     })
-
-
-
 });
 
 

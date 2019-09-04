@@ -10,7 +10,10 @@ const message = mongo.Schema({
         ref: 'User',
     }],
     msg: [{
-        _id: mongo.Schema.Types.ObjectId,
+        _id: {
+            type: mongo.Schema.Types.ObjectId,
+            ref: 'User'
+        },
         body: String,
         createdAt: {
             type: Date,

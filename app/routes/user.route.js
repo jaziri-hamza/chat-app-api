@@ -17,7 +17,7 @@ router.get('/', (req, res)=>{
 
     const page =  parseInt(req.query['pages']) || 1;
 
-    userModel.find({}).skip((page*10)-10).limit(page*10).then( result => {
+    userModel.find({}).select('_id firstName lastName').skip((page*10)-10).limit(page*10).then( result => {
         res.status(200).json(result);
     }).catch( error => {
         res.status(500).json(error);
@@ -59,7 +59,7 @@ router.post('/', (req, res)=>{
 
 
 /** UPDATE  USER */
-router.patch('/:userid', (req, res)=>{
+router.put('/:userid', (req, res)=>{
 
     const userid = req.param.userid;
     const obj = req.body;

@@ -21,10 +21,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 const authentificateRoute = require('./routes/authenticate.route');
 const userRoute = require('./routes/user.route');
 const messageRoute = require('./routes/message.route');
+const favoriteRoute = require('./routes/favorite.route');
 
 app.use('/auth', authentificateRoute);
 app.use('/users', userRoute);
 app.use('/messages', messageRoute);
+app.use('/favorites', favoriteRoute);
 
 
 app.listen(3000, ()=>{ console.log('server listen at port 3000')});
