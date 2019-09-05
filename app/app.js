@@ -12,9 +12,17 @@ mongo.connect('mongodb://mongodb/chat-app', {useNewUrlParser: true, useFindAndMo
 );
 
 
+
+
+/** INITIALISATION BODY-PARSER */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+
+
 /** ALLOW CORS  */
 app.use((req, res, next)=>{
-    res.header('Access-Control-Allow-Orogin', '*');
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
     );
@@ -22,11 +30,8 @@ app.use((req, res, next)=>{
         res.header('Access-Control-Allow-Methods', 'PUT, POST, DELETE, GET');
         return res.status(200).json();
     }
-})
-
-/** INITIALISATION BODY-PARSER */
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+    next();
+});
 
 
 /** IMPOPRT ROUTERS */
