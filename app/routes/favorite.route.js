@@ -11,13 +11,26 @@ router.post('/:userid', guard, (req, res)=>{
     user.findOne({_id: currentUserId , favorite: { $in : userid }}).then( result =>{
         if( result == null ){
             user.findOneAndUpdate({_id: currentUserId}, { $push : { favorite: userid}}, {new: true}).then(resultAdd=>{
-                res.status(201).json(resultAdd);
+                // get information of user addedd and back it 
+                user.findOne({_id: userid}).select("firstName lastName").then( resSelUser => {
+                    res.status(201).json({
+                        status: 201,
+                        favorite: resSelUser
+                    });
+                }).catch( errSelUser => {
+                    res.status(500).json(errSelUser);
+                });
             }).catch( errorAdd=>{
                 res.status(500).json(errorAdd);
             });
         }else{
             user.findOneAndUpdate({_id: currentUserId}, { $pull : { favorite: userid}}, {new: true}).then(resultDel=>{
-                res.status(202).json(resultDel);
+                res.status(202).json({
+                    status: 202,
+                    favorite: {
+                        _id: userid
+                    }
+                });
             }).catch( errorDel=>{
                 res.status(500).json(errorDel);
             });
@@ -35,7 +48,7 @@ router.get('/', guard,(req, res)=>{
     const page = req.query['pages'] || 1;
     const currentUserId = req.currentUser.id;
 
-    user.find({ _id: currentUserId}, {select: 'favorite'}).populate({
+    user.findOne({ _id: currentUserId}, {select: 'favorite'}).populate({
         path: 'favorite',
         select: 'firstName lastName'
     }).slice('favorite', page*10-10, page*10).then(result =>{
