@@ -37,7 +37,7 @@ router.get('/:userid', guard, (req,res)=>{
     const page = parseInt(req.query['pages']) || 1;
 
     console.log(currentUserId);
-    messageModel.find({
+    messageModel.findOne({
         users: { $all: [userid, currentUserId] }
     },{ 
         select: 'msg'
