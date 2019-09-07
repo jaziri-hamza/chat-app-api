@@ -66,6 +66,9 @@ const user = mongo.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    socketID: {
+        type:String
     }
 });
 

@@ -1,8 +1,21 @@
 const express = require('express');
 const app = express();
 
+const http = require('http').createServer(app);
 const mongo = require('mongoose');
 const bodyParser = require('body-parser');
+
+const guardSocket = require('./guard/guard-socket');
+
+const io = require('socket.io')(http);
+
+/**
+ * object {
+ *  _id: idofuser,
+ * socketID: socketid of user
+ * }
+ */
+
 
 
 /** CONNECT TO DB AND CHECK THE CONNECTION */
@@ -33,6 +46,20 @@ app.use((req, res, next)=>{
     next();
 });
 
+// problem at this shiiiit
+
+app.use(guardSocket, (req, res, next)=>{
+    if(req.socketData == null) next();
+    io.on('connection', socket =>{
+        
+        console.log(socket.id);
+        console.log(req.currentUser.id);
+        
+    
+    
+    });
+    next();
+ })
 
 /** IMPOPRT ROUTERS */
 const authentificateRoute = require('./routes/authenticate.route');
@@ -46,4 +73,4 @@ app.use('/messages', messageRoute);
 app.use('/favorites', favoriteRoute);
 
 
-app.listen(3000, ()=>{ console.log('server listen at port 3000')});
+http.listen(3000, ()=>{ console.log('server listen at port 3000')});
