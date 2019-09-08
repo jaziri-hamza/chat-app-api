@@ -10,7 +10,6 @@ router.get('/', guard, (req, res)=>{
 
     const page = parseInt(req.query['pages']) || 1;
     const currentUserId = req.currentUser.id;
-    console.log(currentUserId);
     messageModel.find({
         users: { $in: currentUserId },
     }).populate('msg._id', 'firstName lastName').populate({
@@ -36,7 +35,7 @@ router.get('/:userid', guard, (req,res)=>{
 
     const page = parseInt(req.query['pages']) || 1;
 
-    console.log(currentUserId);
+
     messageModel.findOne({
         users: { $all: [userid, currentUserId] }
     },{ 
@@ -56,7 +55,6 @@ router.get('/:userid', guard, (req,res)=>{
 
 
 router.post('/:userid', guard, (req,res)=>{
-
     const userid = req.params.userid;
     const currentUserId = req.currentUser.id;
     messageModel.findOne({

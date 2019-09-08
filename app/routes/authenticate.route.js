@@ -13,7 +13,6 @@ router.post('/', (req, res)=>{
         { username: username, password: password},
         { email: username, password: password}
     ]}).then( result => {
-        console.log(result);
         if(result == null){
             res.status(401).json('Authentificated failled');
         }else{

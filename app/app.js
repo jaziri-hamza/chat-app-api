@@ -5,7 +5,7 @@ const http = require('http').createServer(app);
 const mongo = require('mongoose');
 const bodyParser = require('body-parser');
 
-const guardSocket = require('./guard/guard-socket');
+const userModel = require('./models/user.model');
 
 const io = require('socket.io')(http);
 
@@ -46,20 +46,73 @@ app.use((req, res, next)=>{
     next();
 });
 
-// problem at this shiiiit
-
-app.use(guardSocket, (req, res, next)=>{
-    if(req.socketData == null) next();
-    io.on('connection', socket =>{
+// SOCKET IO
+io.on('connection', socket =>{
         
-        console.log(socket.id);
-        console.log(req.currentUser.id);
-        
-    
-    
+    socket.on('auth', tokenData=>{
+        userModel.findOneAndUpdate({_id: tokenData.id}, { socketID: socket.id }).exec();
     });
-    next();
- })
+
+
+    socket.on('push-msg', data=>{
+                
+        getUserSocketId(data, socket);
+        
+    });
+
+    
+
+    socket.on('unauth', tokenData=>{
+        userModel.findOneAndUpdate({_id: tokenData.id}, { socketID: ''}).exec();
+    });
+
+
+});
+
+
+async function getUserSocketId(data, socket){
+    console.log("data");
+    console.log(data);
+    console.log("enddata");
+    const sendToSocketid = await userModel.findOne({_id: data.user.sendToId}).select("socketID").then(res=>{
+        return res.socketID
+    }).catch(eer=>{
+        console.log(eer);
+        return null;
+    });
+    console.log("socketid"+ socket.id);
+    console.log(data.user.sendById);
+    const body =  await userModel.findOne({_id: data.user.sendById}).select("_id firstName lastName").then(res=>{
+        return {
+            msg : [
+                {
+                    body: data.msg.body,
+                    createdAt: data.msg.createdAt,
+                    _id: {
+                        _id: res._id,
+                        firstName: res.firstName,
+                        lastName: res.lastName
+                    }
+                }
+            ],
+            users: [
+                {
+                    _id: res._id,
+                    firstName: res.firstName,
+                    lastName: res.lastName
+                }
+            ]
+        };
+    }).catch(err=>{
+        console.log(err);
+        return null;
+    });
+    console.log(sendToSocketid);
+    socket.to(sendToSocketid).emit('pull-msg', body);
+    console.log(socket.id);
+}
+
+
 
 /** IMPOPRT ROUTERS */
 const authentificateRoute = require('./routes/authenticate.route');
