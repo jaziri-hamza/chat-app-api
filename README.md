@@ -3,7 +3,7 @@
 
 
 This is a real-time chat app using NodeJS and Angular
-It’s accompanied with a Angular repo: [client app](https://gitlab.com/irizaj07/chat-app-client)
+It’s accompanied with a Angular repo: [client app](https://github.com/jaziri-hamza/chat-app-client)
 
 
 
